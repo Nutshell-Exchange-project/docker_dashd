@@ -1,5 +1,3 @@
-0.15.0.0-x86_64-linux-gnu.tar.gz
-
 FROM debian:buster
 
 ARG VERSION
