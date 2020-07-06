@@ -24,7 +24,7 @@ RUN set -x && \
   mv include/* /usr/bin/ && \
   mv share/* /usr/bin/ && \
   cd /root && \
-  rm -Rf dashcore-${VERSION} dashcore-${VERSION}-x86_64-linux-gnu.tar.gz
+  rm -Rf dashcore-${VERSION_BUILD} dashcore-${VERSION}-x86_64-linux-gnu.tar.gz
 
 ENV GOSU_VERSION 1.7
 RUN set -x \
