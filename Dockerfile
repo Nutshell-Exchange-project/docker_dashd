@@ -1,7 +1,7 @@
 FROM debian:buster
 
 ARG VERSION
-
+ARG VERSION_BUILD
 ENV USER_ID ${USER_ID:-1000}
 ENV GROUP_ID ${GROUP_ID:-1000}
 
@@ -18,7 +18,7 @@ RUN set -x && \
   wget -q https://github.com/dashpay/dash/releases/download/v${VERSION}/dashcore-${VERSION}-x86_64-linux-gnu.tar.gz && \
       cat checksum.sha256 | grep ${VERSION} | sha256sum -c  && \
   tar xvf dashcore-${VERSION}-x86_64-linux-gnu.tar.gz && \
-  cd dashcore-${VERSION} && \
+  cd dashcore-${VERSION_BUILD} && \
   mv bin/* /usr/bin/ && \
   mv lib/* /usr/bin/ && \
   mv include/* /usr/bin/ && \
