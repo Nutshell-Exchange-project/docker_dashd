@@ -1,23 +1,24 @@
 version: '3.6'
 
 services:
-  dashcoin:
+  mainnet:
+    image: realnuts/docker_dashd:0.15.0-0
     restart: always
-    image: realnuts/docker_dashd:v1.0.15.0.0
+    user: root
     ports:
       - "9998:9998"
-      - "9999:9999"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /opt/dash_data:/dash/data
-    command:
-       - "-printtoconsole"
-       - "-regtest=0"
-       - "-rest"
-       - "-rpcallowip=0/32"
-       - "-rpcallowip=172.17.0.0/16"
-       - "-rpcpassword=test"
-       - "-wallet=wallet1"
-       - "-rpcport=8333"
-       - "-rpcuser=foo"
-       - "-server"
+      - /opt/dash/keys/mainnet:/dash/wallet
+      - /opt/dash/mainnet:/dash/.dashcore/blocks
+      - /opt/dash/config/mainnet-dash.conf:/dash/.dashcore/dash.conf
+
+  testnet:
+    image: realnuts/docker_dashd:0.15.0-0
+    restart: always
+    user: root
+    ports:
+      - "19998:19998"
+    volumes:
+      - /opt/dash/keys/testnet:/dash/wallet
+      - /opt/dash/blocks/testnet:/dash/.dashcore/testnet3/blocks
+      - /opt/dash/config/testnet-dash.conf:/dash/.dashcore/dash.conf
