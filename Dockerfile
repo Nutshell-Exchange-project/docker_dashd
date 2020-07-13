@@ -1,34 +1,59 @@
-FROM debian:buster
-
-ARG USER_ID
-ARG GROUP_ID
-
-ENV HOME /dash
-
-# add user with specified (or default) user/group ids
+FROM ubuntu:bionic
 ENV USER_ID ${USER_ID:-1000}
 ENV GROUP_ID ${GROUP_ID:-1000}
-RUN groupadd -g ${GROUP_ID} dash
-RUN useradd -u ${USER_ID} -g dash -s /bin/bash -m -d /dash dash
+ENV DASH_DATA=/home/dashcore/.dashcore
 
-RUN chown dash:dash -R /dash
-COPY checksum.sha256 /tmp/checksum.sha256
+RUN groupadd -g ${GROUP_ID} dashcore \
+	&& useradd -u ${USER_ID} -g dashcore -s /bin/bash -m -d /dashcore dashcore
 
-ADD https://github.com/dashpay/dash/releases/download/v0.15.0.0/dashcore-0.15.0.0-x86_64-linux-gnu.tar.gz /tmp/
-RUN cd /tmp/ && cat checksum.sha256 | sha256sum -c -
-RUN tar -xvf /tmp/dashcore-*.tar.gz -C /tmp/
-RUN cp /tmp/dashcore*/bin/*  /usr/local/bin
-RUN rm -rf /tmp/dashcore*
+RUN apt-get update -y
 
-ADD ./scripts /usr/local/bin
-RUN chmod a+x /usr/local/bin/*
+RUN apt-get upgrade -y
 
-USER dash
+RUN apt-get install -y apt-utils curl cmake
 
-VOLUME ["/dash"]
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-EXPOSE 9998 9999 19998 19999
+RUN apt-get install -y dialog apt-utils git nano
 
-WORKDIR /dash
+RUN apt-get install -y --no-install-recommends \
+        cron \
+        gosu \
+    && rm -rf /var/lib/apt/lists/*
 
-CMD ["dash_oneshot"]
+RUN apt-get update -y
+
+RUN apt-get install -y -q build-essential libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils default-jdk default-jre libgmp-dev python3
+
+RUN apt-get install -y libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev
+
+RUN apt-get install software-properties-common -y
+
+RUN add-apt-repository ppa:bitcoin/bitcoin -y
+
+RUN apt-get update -y
+
+RUN apt-get install libdb4.8-dev libdb4.8++-dev -y
+
+RUN apt-get install -y libminiupnpc-dev
+
+RUN apt-get install -y libzmq3-dev
+
+RUN cd /tmp && git clone https://github.com/dashpay/dash.git && cd ./dash && git checkout tags/v0.15.0.0
+
+RUN cd /tmp/dash/depends && make && cd /tmp/dash && ./autogen.sh && ./configure --prefix=`pwd`/depends/x86_64-pc-linux-gnu --without-gui && make && make install
+
+RUN rm -rf ./dash
+
+EXPOSE 9998 9999
+
+VOLUME ["/home/dashcore/.dashcore"]
+
+COPY ./docker-entrypoint.sh /usr/local/bin/
+
+RUN chmod 777 /usr/local/bin/docker-entrypoint.sh \
+    && ln -s /usr/local/bin/docker-entrypoint.sh /
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+CMD ["dashd"]

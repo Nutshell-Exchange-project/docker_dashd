@@ -1,24 +1,12 @@
 version: '3.6'
 
 services:
-  mainnet:
-    image: realnuts/docker_dashd:0.15.0-0
+  dashcoin:
     restart: always
-    user: root
+    image: realnuts/docker_dashd:0.15.0.0
     ports:
       - "9998:9998"
+      - "9999:9999"
     volumes:
-      - /opt/dash/keys/mainnet:/dash/wallet
-      - /opt/dash/mainnet:/dash/.dashcore/blocks
-      - /opt/dash/config/mainnet-dash.conf:/dash/.dashcore/dash.conf
-
-  testnet:
-    image: realnuts/docker_dashd:0.15.0-0
-    restart: always
-    user: root
-    ports:
-      - "19998:19998"
-    volumes:
-      - /opt/dash/keys/testnet:/dash/wallet
-      - /opt/dash/blocks/testnet:/dash/.dashcore/testnet3/blocks
-      - /opt/dash/config/testnet-dash.conf:/dash/.dashcore/dash.conf
+      - /opt/blockchain_data/dash_data:/home/dashcore/.dashcore/
+      - ./config/mainnet.conf:/home/dashcore/.dashcore/dash.conf
