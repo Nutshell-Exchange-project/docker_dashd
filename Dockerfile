@@ -10,7 +10,7 @@ RUN apt-get update -y
 
 RUN apt-get upgrade -y
 
-RUN apt-get install -y apt-utils curl cmake
+RUN apt-get install -y apt-utils curl cmake wget
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
@@ -39,11 +39,9 @@ RUN apt-get install -y libminiupnpc-dev
 
 RUN apt-get install -y libzmq3-dev
 
-RUN cd /tmp && git clone https://github.com/dashpay/dash.git && cd ./dash && git checkout tags/v0.15.0.0
+RUN cd /tmp && wget https://github.com/dashpay/dash/releases/download/v0.15.0.0/dashcore-0.15.0.0-x86_64-linux-gnu.tar.gz && tar -zxvf dashcore-0.15.0.0-x86_64-linux-gnu.tar.gz && cd dashcore-0.15.0/bin/ && mv ./dash* /usr/local/bin
 
-RUN cd /tmp/dash/depends && make && cd /tmp/dash && ./autogen.sh && ./configure --prefix=`pwd`/depends/x86_64-pc-linux-gnu --without-gui && make && make install
-
-RUN rm -rf ./dash
+RUN rm -rf /dash*
 
 EXPOSE 9998 9999
 
