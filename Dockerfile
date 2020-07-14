@@ -1,7 +1,7 @@
 FROM ubuntu:bionic
 ENV USER_ID ${USER_ID:-1000}
 ENV GROUP_ID ${GROUP_ID:-1000}
-ENV DASH_DATA=/home/dashcore/.dashcore
+ENV DASHCORE_DATA=/home/dashcore/.dashcore
 
 RUN groupadd -g ${GROUP_ID} dashcore \
 	&& useradd -u ${USER_ID} -g dashcore -s /bin/bash -m -d /dashcore dashcore
@@ -41,7 +41,7 @@ RUN apt-get install -y libzmq3-dev
 
 RUN cd /tmp && wget https://github.com/dashpay/dash/releases/download/v0.15.0.0/dashcore-0.15.0.0-x86_64-linux-gnu.tar.gz && tar -zxvf dashcore-0.15.0.0-x86_64-linux-gnu.tar.gz && cd dashcore-0.15.0/bin/ && mv ./dash* /usr/local/bin
 
-RUN rm -rf /dash*
+RUN rm -rf /tmp/dash*
 
 EXPOSE 9998 9999
 
